@@ -1,0 +1,137 @@
+<html>
+<header>
+    <title>This is title</title>
+<script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs-core"></script>
+<script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs-converter"></script>
+<script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/facemesh"></script>
+
+<script>
+function load_video() {
+    var video = document.getElementById('video');
+
+    if(navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+        navigator.mediaDevices.getUserMedia({ video: true }).then(function(stream) {
+            video.srcObject = stream;
+            video.play();
+        });
+    }
+}
+
+var video;
+var model;
+
+async function init() {
+    video = document.getElementById('video');
+    if(navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+        // Not adding `{ audio: true }` since we only want video now
+        navigator.mediaDevices.getUserMedia({ video: true }).then(function(stream) {
+            //video.src = window.URL.createObjectURL(stream);
+            video.srcObject = stream;
+            video.play();
+        });
+    }
+    model = await facemesh.load();
+}
+
+var preds;
+var left_cheek;
+var right_cheek;
+var lips_lower_inner;
+var left_diff;
+var right_diff;
+var lr;
+var ud;
+var cross;
+var init_lr;
+var init_ud;
+var direction = "centre";
+var interval;
+
+async function main() {
+  const predictions = await model.estimateFaces(video);
+  return predictions
+}
+
+function cross_normalised(x, y){
+    cross = [x[1] * y[2] - x[2] * y[1], x[2] * y[0] - x[0] * y[2],  x[0] * y[1]
+        - x[1] * y[0] ];
+    norm = Math.sqrt((cross[0] ** 2) + (cross[1] ** 2) + (cross[2] ** 2));
+    return [cross[0] / norm, cross[1] / norm, cross[2] / norm]
+}
+
+function get_predictions() {
+  predictions = main()
+  predictions.then(function(val){
+      if (val.length > 0){
+      preds = val[0];
+      left_cheek = preds["annotations"]["leftCheek"][0]
+      right_cheek = preds["annotations"]["rightCheek"][0]
+
+      lips_lower_inner = [0, 0, 0]
+      lips_coords = preds["annotations"]["lipsLowerInner"]
+      for (i=0; i < lips_coords.length; i++) {
+          for (j=0; j < 3; j++){
+            lips_lower_inner[j] += lips_coords[i][j]
+          }
+      }
+      for (j=0; j < 3; j++){
+          lips_lower_inner[j] = lips_lower_inner[j] / lips_coords.length
+      }
+
+      left_diff = [];
+      right_diff = [];
+      for (i=0; i< 3; i++){
+          left_diff.push(left_cheek[i] - lips_lower_inner[i]);
+          right_diff.push(right_cheek[i] - lips_lower_inner[i]);
+      }
+
+      cross = cross_normalised(left_diff, right_diff)
+      console.log(cross);
+
+      lr = cross[0];
+      ud = cross[1];
+      if (init_lr === undefined){
+          init_lr = lr
+      }
+      if (init_ud === undefined){
+          init_ud = ud
+      }
+
+      tol = 0.2
+      if (lr - init_lr > tol){
+          direction = "left";
+      } else if (lr - init_lr < -tol) { 
+          direction = "right";
+      } else if (ud - init_ud > tol) {
+          direction = "down";
+      } else if (ud - init_ud < -tol) {
+          direction = "up";
+      } else {
+          direction = "centre";
+      }
+      document.getElementById('direction').innerHTML = direction;
+      }
+    });
+}
+
+function start() {
+    interval = window.setInterval(() => get_predictions(), 1000/3)
+}
+
+function stop() {
+    window.clearInterval(interval)
+}
+
+
+</script>
+<script>
+</script>
+</header>
+<body onload="init()">
+<video id="video" width="640" height="480" autoplay></video>
+
+<div id="direction"> </div>
+<button onclick="start()"> Start! </button>
+<button onclick="stop()"> Stop </button>
+</body>
+</html>
