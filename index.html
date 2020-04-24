@@ -222,13 +222,13 @@ function stop_pred() {
     }
 
     update_step(obj){
-        if (direction == 'down'){
+        if (direction == 'down' && obj.direction != 'U'){
             obj.direction = "D";
-        } else if (direction == 'up'){
+        } else if (direction == 'up' && obj.direction != 'D'){
             obj.direction = "U";
-        } else if (direction == 'left'){
+        } else if (direction == 'left' && obj.direction != 'R'){
             obj.direction = "L";
-        } else if (direction == 'right'){
+        } else if (direction == 'right' && obj.direction != 'L'){
             obj.direction = "R";
         } 
 
