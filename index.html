@@ -294,9 +294,26 @@ video {
     -webkit-transform:rotateY(180deg); /* Safari and Chrome */
     -moz-transform:rotateY(180deg); /* Firefox */
 }
+
+.content {
+  margin: auto;
+  text-align:center;
+}
+
+button {
+  background-color: #555555;
+  border: none;
+  color: white;
+  padding: 10px 17px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+}
 </style>
 
 </header>
+<div class="content">
 <body onload="init()">
     <h2> Play snake with your face! </h2>
     <p> Look straight ahead and press "Begin game". </p>
@@ -313,9 +330,10 @@ Difficulty:
   <input id="r3" type="radio" name="difficulty" value="hard" /> Hard
 <!--<input id='difficulty' type="range" min="1" max="7" value="3"> -->
 <br>
+<br>
+
 <button id="button" onclick=begin_game()>Begin game</button>
 
-<br>
 <br>
 <br>
 
@@ -326,4 +344,5 @@ Difficulty:
 <!-- <button onclick="start_pred()"> Start! </button>
 <button onclick="stop_pred()"> Stop </button> -->
 </body>
+</div>
 </html>
