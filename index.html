@@ -1,5 +1,6 @@
 <html>
 <header>
+<meta charset="UTF-8">
     <title>Snake face</title>
 <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs-core"></script>
 <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs-converter"></script>
@@ -28,6 +29,8 @@ async function init() {
             //video.src = window.URL.createObjectURL(stream);
             video.srcObject = stream;
             video.play();
+        }).catch(function() {
+            document.getElementById('warning').innerHTML = "Please check your permissions: access to camera is needed to estimate head direction to control the snake."
         });
     }
     model = await facemesh.load();
@@ -320,6 +323,7 @@ button {
     before the game begins.
     <br>Best performance on desktop.</p>
     <br>
+    <div id='warning'></div>
 
 <canvas id="snake_board" width="200" height="200"></canvas>
 <br>
