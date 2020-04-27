@@ -17,3 +17,6 @@ the centre of the lips to the left and right cheeks. These two vectors lie
 on a plane that approximates the surface of the face. The cross product of these
 vectors is normal to this plane and thus points approximately in the direction
 of the head.
+
+
+You can read more about this here: <a href=""http://paulrubenstein.co.uk/blog/>http://paulrubenstein.co.uk/blog/</a>
